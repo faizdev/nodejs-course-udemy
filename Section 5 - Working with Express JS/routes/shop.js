@@ -8,7 +8,15 @@ const { products } = require('./admin')
 
 router.get("/", (req, res, next) => {
 
-    res.render('shop/index', {products: products, pageTitle: 'Shop', path: "/"});
+    res.render('shop/index', {
+        products: products, 
+        pageTitle: 'Shop', 
+        path: "/",
+        hasProduct: products.length > 0,
+        activeShop: true,
+        productCSS:true,
+        shopCSS:true
+    });
     // res.sendFile(path.join(rootDir, "views/shop", "index.html"))
 })
 
