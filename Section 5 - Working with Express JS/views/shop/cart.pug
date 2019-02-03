@@ -1,0 +1,10 @@
+extends ../layouts/main-layout
+
+block page-content
+    main
+        if products && products.length > 0
+            ul
+                each product in products
+                    li #{product.productData.title}
+        else
+            h1 No Product in cart

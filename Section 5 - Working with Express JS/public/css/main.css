@@ -99,10 +99,20 @@ main {
   background: white;
   border-radius: 3px;
   cursor: pointer;
+  padding: 5px 15px;
+  text-decoration: none;
 }
 
 .btn:hover,
 .btn:active {
   background-color: #00695c;
   color: white;
+}
+
+.card__actions form {
+  display: inline
+}
+
+.center {
+  text-align: center;
 }

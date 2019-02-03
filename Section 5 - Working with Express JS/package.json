@@ -4,7 +4,7 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "start": "nodemon app.js",
+    "start": "DEBUG=general:log,general:error,model:log,model:error,controller:error nodemon app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -14,6 +14,11 @@
     "ejs": "^2.6.1",
     "express": "^4.16.4",
     "express-handlebars": "^3.0.0",
-    "pug": "^2.0.3"
+    "mysql2": "^1.6.4",
+    "pug": "^2.0.3",
+    "uuid": "^3.3.2"
+  },
+  "devDependencies": {
+    "debug": "^4.1.1"
   }
 }
