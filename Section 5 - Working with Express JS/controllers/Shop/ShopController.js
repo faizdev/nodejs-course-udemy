@@ -12,28 +12,37 @@ exports.getIndex = (req, res, next) => {
 }
 
 exports.getProducts = (req, res, next) => {
-    Product.fetchAll(products => {
-        res.render("shop/product-list", {
-            products: products,
-            pageTitle: "Products",
-            path: "/products"
+    debugControllerLog("Fetching product")
+    Product.fetchAll()
+        .then(([rows]) => {
+            debugControllerLog("SQL Finished")
+            res.render("shop/product-list", {
+                products: rows,
+                pageTitle: "Products",
+                path: "/products",
+                hasProduct: rows.length > 0
+            })
         })
-    })
+        .catch()
 }
 
 exports.getProductDetail = (req, res, next) => {
     const productId = req.params.productId
 
     Product.findById(productId)
-        .then((product) => {
-            debug('Succesfully fetch product', product)
-            res.render("shop/product-detail", {
-                pageTitle: "Product Detail",
-                path: "/products",
-                product: product
-            })
+        .then(([product]) => {
+            debugControllerLog('Succesfully fetch product', product[0])
+            if(product.length > 0) {
+                res.render("shop/product-detail", {
+                    pageTitle: "Product Detail",
+                    path: "/products",
+                    product: product[0]
+                })
+            } else 
+                next()
+            
         })
-        .catch(e => debug('Failed fetching Product with id: %o', productId))
+        .catch(e => debugControllerError('Failed fetching Product with id: %o', productId))
 }
 
 // CART SECTION

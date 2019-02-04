@@ -4,7 +4,7 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "start": "DEBUG=general:log,general:error,model:log,model:error,controller:error nodemon app.js",
+    "start": "DEBUG=general:log,general:error,model:log,model:error,controller:log,controller:error nodemon app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -16,6 +16,7 @@
     "express-handlebars": "^3.0.0",
     "mysql2": "^1.6.4",
     "pug": "^2.0.3",
+    "sequelize": "^4.42.0",
     "uuid": "^3.3.2"
   },
   "devDependencies": {

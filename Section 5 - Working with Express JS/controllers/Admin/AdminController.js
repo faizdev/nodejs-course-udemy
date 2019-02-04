@@ -2,14 +2,16 @@ const Product = require("../../models/product")
 const {debugControllerLog, debugControllerError} = require('../../utils/debugger')
 
 exports.getProducts = (req, res, next) => {
-    Product.fetchAll(products => {
-        res.render("admin/products", {
-            products: products,
-            pageTitle: "Admin Products",
-            path: "/admin/products",
-            hasProduct: products.length > 0
+    Product.fetchAll()
+        .then(([rows]) => {
+            res.render("admin/products", {
+                products: rows,
+                pageTitle: "Admin Products",
+                path: "/admin/products",
+                hasProduct: rows.length > 0
+            })
         })
-    })
+        .catch()
 }
 
 exports.getAddProduct = (req, res, next) => {
@@ -28,9 +30,8 @@ exports.postAddProduct = (req, res, next) => {
 
     // console.log(req.body.productId)
     const product = new Product(productId ,title, imageUrl, description, price)
-    // res.json(product)
 
-    product.save()
+    product.save().then().catch(err => debugControllerError("Error Saving Product",err))
     res.redirect(301,"/admin/products")
 }
 
