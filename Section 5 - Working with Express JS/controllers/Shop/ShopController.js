@@ -1,7 +1,10 @@
 const debug = require('debug')('http:shopController')
 const Product = require("../../models/product")
-const Cart = require("../../models/cart")
-const {debugControllerLog, debugControllerError} = require('../../utils/debugger')
+
+const {
+    debugControllerLog,
+    debugControllerError
+} = require('../../utils/debugger')
 
 exports.getIndex = (req, res, next) => {
     debug("Woooyeah")
@@ -13,74 +16,116 @@ exports.getIndex = (req, res, next) => {
 
 exports.getProducts = (req, res, next) => {
     debugControllerLog("Fetching product")
-    Product.fetchAll()
-        .then(([rows]) => {
-            debugControllerLog("SQL Finished")
+    req.user.getProducts()
+        .then(products => {
             res.render("shop/product-list", {
-                products: rows,
+                products: products,
                 pageTitle: "Products",
                 path: "/products",
-                hasProduct: rows.length > 0
             })
+        }).catch(err => {
+            debugControllerError("Fetching products error")
         })
-        .catch()
 }
 
 exports.getProductDetail = (req, res, next) => {
     const productId = req.params.productId
 
-    Product.findById(productId)
-        .then(([product]) => {
-            debugControllerLog('Succesfully fetch product', product[0])
-            if(product.length > 0) {
+    req.user.getProducts({
+            where: {
+                id: productId
+            }
+        })
+        .then(products => {
+            const product = products[0]
+            if (!product) {
+                next()
+            } else {
+                debugControllerLog('Succesfully fetch product')
                 res.render("shop/product-detail", {
                     pageTitle: "Product Detail",
                     path: "/products",
-                    product: product[0]
+                    product: product
                 })
-            } else 
-                next()
-            
+            }
+
         })
-        .catch(e => debugControllerError('Failed fetching Product with id: %o', productId))
+        .catch(e => debugControllerError('Failed fetching Product with id: %o', e))
 }
 
 // CART SECTION
 exports.getCart = (req, res, next) => {
-    Cart.getCart()
+
+    req.user.getCart()
         .then(cart => {
-            Product.fetchAll(products => {
-                let cartProducts = []
-                for (product of products) {
-                    const cartProductData = cart.products.find(prod => prod.id === product.id)
-                    if (cartProductData) {
-                        cartProducts.push({productData: product, qty: cartProductData.qty})
-                    }
-                }
-                res.render("shop/cart", {
-                    pageTitle: "Cart",
-                    path: "/cart",
-                    products: cartProducts
-                })
+            return cart.getProducts()
+        })
+        .then(products => {
+            debugControllerLog(products)
+            res.render("shop/cart", {
+                pageTitle: "Cart",
+                path: "/cart",
+                products: products
             })
         })
-        .catch(e => {
-            debugControllerError("failed get cart", e)
-            res.redirect("/")
+        .catch(err => {
+            debugControllerError("Fetching cart failed", err)
+            next()
         })
 }
 
 exports.postAddToCart = (req, res, next) => {
     const productId = req.body.productId
-    Product.findById(productId)
+    let fetchedCart
+    let newQuantity = 1
+    req.user.getCart()
+        .then(cart => {
+            fetchedCart = cart
+            return cart.getProducts({
+                where: {
+                    id: productId
+                }
+            })
+        })
+        .then(products => {
+            let product
+            if (products.length > 0) {
+                product = products[0]
+            }
+            if (product) {
+                const oldQuantity = product.cartItem.quantity
+                newQuantity = oldQuantity + 1
+                return product
+            }
+            return Product.findById(productId)
+        })
         .then(product => {
-            debug(" Product add to cart", product)
-            Cart.addProduct(product.id, product.price)
+            return fetchedCart.addProduct(product, {
+                through: {
+                    quantity: newQuantity
+                }
+            })
         })
         .then(() => {
-            debug("Redirecting to /cart")
             res.redirect('/cart')
         })
+        .catch(err => debugControllerError("failed get cart", err))
+}
+
+exports.postCartDeleteProduct = (req, res, next) => {
+    const productId = req.body.productId
+    req.user.getCart()
+        .then(cart => {
+            return cart.getProducts({where: {id:productId}})
+        })
+        .then(products => {
+            const product = products[0]
+            return product.cartItem.destroy()
+        })
+        .then(result => {
+            res.redirect('/cart')
+        })
+        .catch(err => debugControllerError("fetch cart failed", err))
 }
 
 
@@ -94,8 +139,47 @@ exports.getCheckout = (req, res, next) => {
 
 // ORDER SECTION
 exports.getOrders = (req, res, next) => {
-    res.render("shop/orders", {
-        pageTitle: "Orders",
-        path: "/orders"
-    })
+    req.user.getOrders({include: ['products']})
+        .then(orders => {
+            orders.forEach((order) => {
+                console.log(order)
+            })
+            res.render("shop/orders", {
+                pageTitle: "Orders",
+                path: "/orders",
+                orders: orders
+            })
+        })
+        .catch(err => {
+            debugControllerError("Get Order error", err)
+        })
+}
+
+exports.postOrder = (req, res, next) => {
+    let fetchedCart
+    req.user.getCart()
+        .then(cart => {
+            fetchedCart = cart
+            return cart.getProducts()
+        })
+        .then(products => {
+            return req.user
+                .createOrder()
+                .then(order => {
+                    return order.addProduct(products.map(product => {
+                        product.orderItem = {quantity: product.cartItem.quantity}
+                        return product
+                    }))
+                })
+                .then(result => {
+                    return fetchedCart.setProducts(null)
+                })
+                .then(result => {
+                    res.redirect('/orders')
+                })
+                .catch(err => {
+                    debugControllerError("create order fails", err)
+                })
+        })
+        .catch(err => debugControllerError("Post Order error", err))
 }

@@ -25,8 +25,14 @@
     // /cart  => POST
     router.post("/cart", shopController.postAddToCart)
 
+    // /cart/delete-product  => POST
+    router.post("/cart/delete-product", shopController.postCartDeleteProduct)
+
     // /orders  => GET
     router.get("/orders", shopController.getOrders)
+
+    // /orders  => POST
+    router.post("/create-order", shopController.postOrder)
 
     // /checkout  => GET
     router.get("/checkout", shopController.getCheckout)

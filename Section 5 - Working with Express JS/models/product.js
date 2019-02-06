@@ -1,36 +1,24 @@
-const fs = require("fs")
-const {debugModelLog, debugModelError} = require('../utils/debugger')
-const db = require('../utils/database')
+const Sequelize = require('sequelize')
 
-module.exports = class Product {
+const sequelize = require('../utils/database')
 
-    constructor(id, title, imageUrl, description, price) {
-        this.id = id
-        this.title = title
-        this.imageUrl = imageUrl
-        this.description = description
-        this.price = price
+const Product = sequelize.define('product', {
+    id: {
+        type: Sequelize.INTEGER,
+        autoIncrement: true,
+        allowNull: false,
+        primaryKey: true
+    },
+    title: Sequelize.STRING(255),
+    price: {
+        type: Sequelize.DOUBLE,
+        allowNull: false
+    },
+    imageUrl: {
+        type: Sequelize.TEXT,
+        allowNull: false
+    },
+    description: Sequelize.STRING(255)
+})
 
-        this.tableName = 'product'
-    }
-    
-
-    save() {
-        debugModelLog("saving product")
-        return db.execute(`INSERT INTO product (title, price, imageUrl, description) VALUES (?, ?, ?, ?)`,
-        [this.title, this.price, this.imageUrl, this.description])
-    }
-
-    static findById(id) {
-        return db.execute("SELECT * FROM product WHERE id = ? ",[id])
-    }
-
-    static fetchAll() {
-        debugModelLog("Fetching product")
-        return db.execute(`SELECT * FROM  product`)
-    }
-
-    static delegeById(id) {
-        return db.execute("DELETE FROM product WHERE id = ?", [id])
-    }
-}
+module.exports = Product

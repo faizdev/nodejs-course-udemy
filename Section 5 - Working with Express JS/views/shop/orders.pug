@@ -1,1 +1,17 @@
 extends ../layouts/main-layout
+
+block page-content
+    main
+        if orders && orders.length > 0
+            ul.order__item-list
+                each order in orders
+                    li.order__item 
+                        h1 NO:#{order.id}
+                        ul
+                            each product in order.products
+                                li
+                                    h2 #{product.title}  (#{product.orderItem.quantity})
+            form(action="/create-order", method="post")
+                button.btn(type="submit") Checkout
+        else
+            h1 No Product in cart

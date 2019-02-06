@@ -6,7 +6,7 @@ block page-styles
 
 block page-content
     main
-        form.product-form(action="/admin/add-product", method="POST")
+        form.product-form(action="/admin/edit-product", method="POST")
             .form-control
                 label(for="title") Title
                 input(type="text", name="title", id="title", value=product?product.title:'')

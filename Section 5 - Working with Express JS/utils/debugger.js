@@ -1,6 +1,6 @@
+exports.debugGeneralLog = require("debug")("general:log")
+exports.debugGeneralError = require("debug")("general:error")
 exports.debugControllerLog = require("debug")("controller:log")
 exports.debugControllerError = require("debug")("controller:error")
 exports.debugModelLog = require("debug")("model:log")
 exports.debugModelError = require("debug")("model:error")
-exports.debugGeneralLog = require("debug")("general:log")
-exports.debugGeneralError = require("debug")("general:error")
