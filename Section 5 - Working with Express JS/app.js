@@ -32,7 +32,7 @@ app.use((req, res, next) => {
         .then(user => {
             if (user) {
                 debugGeneralLog("User found", user)
-                req.user = user
+                req.user = new User(user.username, user.email, user.cart, user._id)
                 next()
             } else {
                 debugGeneralLog("User not found, creating new user")

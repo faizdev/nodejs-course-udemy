@@ -20,19 +20,19 @@
     router.get("/product/:productId", shopController.getProductDetail)
 
     // // /cart  => GET
-    // router.get("/cart", shopController.getCart)
+    router.get("/cart", shopController.getCart)
 
     // // /cart  => POST
-    // router.post("/cart", shopController.postAddToCart)
+    router.post("/cart", shopController.postAddToCart)
 
     // // /cart/delete-product  => POST
-    // router.post("/cart/delete-product", shopController.postCartDeleteProduct)
+    router.post("/cart/delete-product", shopController.postCartDeleteProduct)
 
     // // /orders  => GET
-    // router.get("/orders", shopController.getOrders)
+    router.get("/orders", shopController.getOrders)
 
     // // /orders  => POST
-    // router.post("/create-order", shopController.postOrder)
+    router.post("/create-order", shopController.postOrder)
 
     // // /checkout  => GET
     // router.get("/checkout", shopController.getCheckout)

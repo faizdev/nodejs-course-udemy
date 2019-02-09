@@ -7,9 +7,9 @@ block page-content
                 each product in products
                     li.cart__item 
                         h1 #{product.title}
-                        h2 Quantity: #{product.cartItem.quantity}
+                        h2 Quantity: #{product.quantity}
                         form(action="/cart/delete-product", method="post")
-                            input(type="hidden", value=product.id, name="productId")
+                            input(type="hidden", value=product._id, name="productId")
                             button.btn.danger(type="submit") Delete
             form(action="/create-order", method="post")
                 button.btn(type="submit") Checkout

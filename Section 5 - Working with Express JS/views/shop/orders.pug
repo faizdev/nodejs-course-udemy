@@ -6,11 +6,11 @@ block page-content
             ul.order__item-list
                 each order in orders
                     li.order__item 
-                        h1 NO:#{order.id}
+                        h1 NO:#{order._id}
                         ul
-                            each product in order.products
+                            each product in order.items
                                 li
-                                    h2 #{product.title}  (#{product.orderItem.quantity})
+                                    h2 #{product.title}  (#{product.quantity})
             form(action="/create-order", method="post")
                 button.btn(type="submit") Checkout
         else
